@@ -1,6 +1,8 @@
 heroku-buildpack-vips
 =====================
 
+*Note: This fork just adds support for AVIF encoding to libvips*
+
 A VIPS buildpack for the modern Heroku stacks. This stack supports the following
 stacks:
 
