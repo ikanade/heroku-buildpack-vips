@@ -43,8 +43,8 @@ RUN apt-get update && apt-get install -y \
   libfftw3-dev \
   libpoppler-glib-dev \
   libwebp-dev \
-  libaom-dev \
-  libx265-dev
+  libaom2 \
+  x265
 
 # build our stack to this prefix
 ARG VIPS_PREFIX=/usr/local/vips
