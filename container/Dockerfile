@@ -7,6 +7,7 @@ ENV DEBIAN_FRONTEND noninteractive
 # pre-baked tarballs
 RUN apt-get update && apt-get install -y \
   build-essential \
+  software-properties-common \
   autoconf \
   automake \
   cmake \
@@ -17,6 +18,11 @@ RUN apt-get update && apt-get install -y \
   wget \
   git \
   pkg-config
+
+# add the libheif PPA -- it includes AVIF and HEIC support
+RUN add-apt-repository ppa:strukturag/libde265 \
+  && add-apt-repository ppa:strukturag/libheif \
+  && apt-get update
 
 # heroku buildpacks include some libraries, like tiff and jpeg, as part of the
 # run-time platform, and we want to use those libs if we can
@@ -36,7 +42,9 @@ RUN apt-get update && apt-get install -y \
   libxml2-dev \
   libfftw3-dev \
   libpoppler-glib-dev \
-  libwebp-dev
+  libwebp-dev \
+  libaom-dev \
+  libx265-dev
 
 # build our stack to this prefix
 ARG VIPS_PREFIX=/usr/local/vips
@@ -90,7 +98,7 @@ RUN wget ${DE265_URL}/v${DE265_VERSION}/libde265-${DE265_VERSION}.tar.gz \
   && make V=0 \
   && make install
 
-ARG HEIF_VERSION=1.10.0
+ARG HEIF_VERSION=1.12.0
 ARG HEIF_URL=https://github.com/strukturag/libheif/releases/download
 
 RUN wget ${HEIF_URL}/v${HEIF_VERSION}/libheif-${HEIF_VERSION}.tar.gz \
@@ -100,7 +108,7 @@ RUN wget ${HEIF_URL}/v${HEIF_VERSION}/libheif-${HEIF_VERSION}.tar.gz \
   && make V=0 \
   && make install
 
-ARG VIPS_VERSION=8.10.5
+ARG VIPS_VERSION=8.12.1
 ARG VIPS_URL=https://github.com/libvips/libvips/releases/download
 
 RUN wget ${VIPS_URL}/v${VIPS_VERSION}/vips-${VIPS_VERSION}.tar.gz \
@@ -108,7 +116,8 @@ RUN wget ${VIPS_URL}/v${VIPS_VERSION}/vips-${VIPS_VERSION}.tar.gz \
   && cd vips-${VIPS_VERSION} \
   && ./configure --prefix=$VIPS_PREFIX \
   && make V=0 \
-  && make install
+  && make install \
+  && ldconfig
 
 # clean the build area ready for packaging
 RUN cd $VIPS_PREFIX \
